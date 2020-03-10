@@ -1,5 +1,8 @@
 .idea
+.tox
+__pycache__
+
 dist
 build
-telemetry_knabben.egg-info/
-__pycache__
+graphene_telemetry.egg-info/
+
