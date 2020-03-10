@@ -1,1 +1,4 @@
 .idea
+dist
+build
+telemetry_knabben.egg-info/
