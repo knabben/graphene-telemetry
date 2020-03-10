@@ -3,4 +3,6 @@ FROM python:buster
 WORKDIR /app
 COPY . /app/
 
+RUN python3 -m pip install --upgrade setuptools wheel twine
+
 CMD ["/app/scripts/build.sh"]
