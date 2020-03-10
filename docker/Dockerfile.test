@@ -1,0 +1,6 @@
+FROM python:buster
+
+WORKDIR /app
+COPY * /app
+
+CMD tox
