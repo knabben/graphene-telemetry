@@ -1,23 +1,33 @@
-from opentelemetry import trace
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
-from opentelemetry.ext.jaeger import JaegerSpanExporter
+from telemetry.tracer import init_tracer, get_tracer
+
+init_tracer()
 
 
-# TODO - Make these settings configuration
-exporter = JaegerSpanExporter(
-    service_name="basic-middleware",
-    agent_host_name="localhost",
-    agent_port=6831,
-)
+class TelemetryMiddleware(object):
+    """ Telemetry middleware integration. """
 
-trace.set_preferred_tracer_provider_implementation(lambda T: TracerProvider())
-trace.tracer_provider().add_span_processor(BatchExportSpanProcessor(exporter))
+    def resolve(self, next, root, info, **args):
+        tracer = get_tracer()
+        self._set_query(info, tracer)
 
+        with tracer.start_as_current_span(info.field_name) as span:
+            promise = next(root, info, **args)
+            promise_value = promise.get()
 
-def tracer_middleware(next, root, info, **args):
-    tracer = trace.get_tracer(__name__)
+            try:
+                return_type = info.return_type.name
+            except AttributeError:
+                return_type = info.return_type.of_type.name
 
-    with tracer.start_as_current_span("graphene") as span:
-        span.set_attribute("schema", str(info.schema))
-        return next(root, info, **args)
+            span.set_attribute("operation", str(info.operation.operation))
+            span.set_attribute("source", str(info.operation.loc.source.body))
+            span.set_attribute("parent_type", str(info.parent_type.name))
+            span.set_attribute("return_type", str(return_type))
+            span.set_attribute("value", str(promise_value))
+
+        return promise
+
+    def _set_query(self, info, tracer):
+        parent_span = tracer.get_current_span()
+        if "schema" not in parent_span.attributes:
+            parent_span.set_attribute("schema", str(info.schema))
