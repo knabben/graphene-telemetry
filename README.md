@@ -23,12 +23,12 @@ First Span is provided by the OpenTelemetry WSGI, install it in your Django wsgi
 import os
 
 from django.core.wsgi import get_wsgi_application
-from opentelemetry.ext.wsgi import OpenTelemetryMiddleware
+from telemetry.wsgi import get_telemetry_app
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'microservice.settings')
 
 application = get_wsgi_application()
-application = OpenTelemetryMiddleware(application)
+application = get_telemetry_app(application)
 ```
 
 The GraphQL attributes dump is provided in a child span, you need to enable it via a graphene middleware.
@@ -36,6 +36,8 @@ The GraphQL attributes dump is provided in a child span, you need to enable it v
 ```
 GRAPHENE = {
     "SCHEMA": "your_project.schema",
-    "MIDDLEWARE": ["telemetry.middleware.tracer_middleware"],
+    "MIDDLEWARE": [
+      "telemetry.middleware.TelemetryMiddleware"
+    ],
 }
 ```
