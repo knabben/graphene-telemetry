@@ -7,7 +7,7 @@ def init_tracer():
     from opentelemetry.ext.jaeger import JaegerSpanExporter
 
     exporter = JaegerSpanExporter(
-        service_name="basic-1", agent_host_name="localhost", agent_port=6831,
+        service_name="basic", agent_host_name="localhost", agent_port=6831
     )
 
     trace.set_tracer_provider(TracerProvider())
