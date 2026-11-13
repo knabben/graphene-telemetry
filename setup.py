@@ -22,7 +22,7 @@ setuptools.setup(
     install_requires=[
         "opentelemetry-ext-wsgi",
         "opentelemetry-ext-jaeger",
-        "opentelemetry-api==0.5b0",
+        "opentelemetry-api==1.45.2",
         "opentelemetry-sdk==0.5b0"
     ]
 )
